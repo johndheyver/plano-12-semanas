@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plano 12 Semanas</title>
+<meta name="theme-color" content="#0a0a0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Plano 12sem">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a0a;--surface:#111111;--surface2:#1a1a1a;--border:#222222;
+    --accent:#e8ff4a;--accent2:#ff6b35;--accent3:#4af0ff;--accent4:#b97cff;
+    --text:#f0f0f0;--muted:#666;
+    --phase1:#e8ff4a;--phase2:#ff6b35;--phase3:#4af0ff;--nutri:#b97cff;--check:#22c55e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden;}
+
+  header{position:relative;padding:60px 40px 40px;border-bottom:1px solid var(--border);overflow:hidden;}
+  header::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(232,255,74,.08) 0%,transparent 70%);pointer-events:none;}
+  .header-tag{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;opacity:.8;}
+  h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,96px);line-height:.9;letter-spacing:2px;}
+  h1 span{color:var(--accent);}
+  .header-meta{display:flex;gap:32px;margin-top:24px;flex-wrap:wrap;}
+  .meta-item{display:flex;flex-direction:column;gap:2px;}
+  .meta-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+  .meta-value{font-size:15px;font-weight:500;}
+
+  .phases-nav{display:flex;padding:0 40px;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+  .phases-nav::-webkit-scrollbar{display:none;}
+  .phase-tab{padding:20px 22px;cursor:pointer;border-bottom:3px solid transparent;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);transition:all .2s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;}
+  .phase-tab:hover{color:var(--text);}
+  .phase-tab.active[data-phase="checkin"]{color:var(--check);border-bottom-color:var(--check);}
+  .phase-tab.active[data-phase="nutri"]{color:var(--nutri);border-bottom-color:var(--nutri);}
+  .phase-tab.active[data-phase="1"]{color:var(--phase1);border-bottom-color:var(--phase1);}
+  .phase-tab.active[data-phase="2"]{color:var(--phase2);border-bottom-color:var(--phase2);}
+  .phase-tab.active[data-phase="3"]{color:var(--phase3);border-bottom-color:var(--phase3);}
+  .phase-tab.active[data-phase="cardio"]{color:var(--accent2);border-bottom-color:var(--accent2);}
+
+  .content{padding:40px;max-width:1100px;margin:0 auto;}
+  .phase-panel{display:none;}
+  .phase-panel.active{display:block;}
+
+  .phase-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;gap:24px;flex-wrap:wrap;}
+  .phase-title{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:2px;line-height:1;}
+  .phase-subtitle{font-size:14px;color:var(--muted);margin-top:6px;font-weight:300;}
+  .phase-badge{padding:8px 20px;border-radius:2px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;}
+  .badge-p1{background:rgba(232,255,74,.12);color:var(--phase1);border:1px solid rgba(232,255,74,.3);}
+  .badge-p2{background:rgba(255,107,53,.12);color:var(--phase2);border:1px solid rgba(255,107,53,.3);}
+  .badge-p3{background:rgba(74,240,255,.12);color:var(--phase3);border:1px solid rgba(74,240,255,.3);}
+  .badge-nutri{background:rgba(185,124,255,.12);color:var(--nutri);border:1px solid rgba(185,124,255,.3);}
+  .badge-check{background:rgba(34,197,94,.12);color:var(--check);border:1px solid rgba(34,197,94,.3);}
+
+  .week-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:40px;}
+  .day-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:border-color .2s;}
+  .day-card:hover{border-color:#333;}
+  .day-card.rest{opacity:.5;}
+  .day-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .day-name{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+  .day-type{font-size:12px;font-weight:600;padding:3px 10px;border-radius:2px;}
+  .type-upper{background:rgba(232,255,74,.1);color:var(--phase1);}
+  .type-lower{background:rgba(255,107,53,.1);color:var(--phase2);}
+  .type-full{background:rgba(74,240,255,.1);color:var(--phase3);}
+  .type-rest{background:rgba(255,255,255,.05);color:var(--muted);}
+  .day-body{padding:16px 18px;}
+  .exercise-list{list-style:none;}
+  .exercise-item{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);gap:12px;}
+  .exercise-item:last-child{border-bottom:none;}
+  .exercise-name{font-size:13px;flex:1;}
+  .exercise-sets{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);white-space:nowrap;}
+
+  .section-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;margin-bottom:16px;margin-top:40px;}
+
+  .prog-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .prog-table th{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:left;padding:12px 16px;border-bottom:1px solid var(--border);}
+  .prog-table td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;}
+  .prog-table tr:last-child td{border-bottom:none;}
+  .prog-table tr:hover td{background:rgba(255,255,255,.02);}
+
+  .cardio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:40px;}
+  .cardio-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:24px;}
+  .cardio-week{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;}
+  .cardio-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:16px;}
+  .cardio-detail{display:flex;flex-direction:column;gap:8px;}
+  .cardio-row{display:flex;justify-content:space-between;font-size:13px;}
+  .cardio-label{color:var(--muted);}
+  .cardio-val{font-weight:500;}
+
+  .notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:16px;}
+  .note-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:18px 20px;}
+  .note-card.orange{border-left-color:var(--accent2);}
+  .note-card.blue{border-left-color:var(--accent3);}
+  .note-card.purple{border-left-color:var(--nutri);}
+  .note-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  .note-text{font-size:13px;line-height:1.6;color:#ccc;}
+
+  .p1-color{color:var(--phase1);}.p2-color{color:var(--phase2);}.p3-color{color:var(--phase3);}
+  .divider{height:1px;background:var(--border);margin:40px 0;}
+
+  /* NUTRITION */
+  .macro-bar{display:flex;gap:16px;margin-bottom:32px;flex-wrap:wrap;}
+  .macro-pill{flex:1;min-width:140px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:20px;text-align:center;}
+  .macro-num{font-family:'Bebas Neue',sans-serif;font-size:40px;line-height:1;}
+  .macro-unit{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:2px;}
+  .macro-name{font-size:12px;color:var(--muted);margin-top:4px;}
+  .kcal-color{color:var(--accent);}.prot-color{color:var(--phase2);}.carb-color{color:var(--accent3);}.fat-color{color:var(--nutri);}
+
+  .meal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:32px;}
+  .meal-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+  .meal-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .meal-name{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+  .meal-kcal{font-size:12px;font-weight:600;padding:3px 10px;border-radius:2px;background:rgba(185,124,255,.1);color:var(--nutri);}
+  .meal-body{padding:16px 18px;}
+  .meal-item{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;gap:12px;}
+  .meal-item:last-child{border-bottom:none;}
+  .meal-item-name{flex:1;}
+  .meal-item-macro{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);white-space:nowrap;}
+  .meal-prot{font-size:12px;color:var(--phase2);font-weight:500;margin-top:8px;}
+  .meal-alt{margin-top:10px;font-size:12px;color:var(--muted);font-style:italic;}
+
+  .salad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:32px;}
+  .salad-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:16px;}
+  .salad-num{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--accent);line-height:1;margin-bottom:4px;}
+  .salad-name{font-size:13px;font-weight:500;margin-bottom:4px;}
+  .salad-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+  /* CHECKLIST */
+  .checkin-top{display:flex;gap:16px;align-items:center;margin-bottom:32px;flex-wrap:wrap;}
+  .date-nav{display:flex;align-items:center;gap:12px;}
+  .date-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 16px;cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;border-radius:2px;transition:background .2s;}
+  .date-btn:hover{background:var(--surface2);}
+  .current-date{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;color:var(--accent);min-width:200px;text-align:center;}
+  .reset-btn{background:rgba(255,99,71,.1);border:1px solid rgba(255,99,71,.3);color:#ff6347;padding:8px 16px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;border-radius:2px;letter-spacing:1px;margin-left:auto;}
+  .reset-btn:hover{background:rgba(255,99,71,.2);}
+
+  .progress-summary{display:flex;gap:16px;margin-bottom:32px;flex-wrap:wrap;}
+  .prog-pill{flex:1;min-width:100px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:16px;text-align:center;}
+  .prog-pill-num{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:var(--check);}
+  .prog-pill-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:4px;}
+
+  .check-section{margin-bottom:28px;}
+  .check-section-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+  .check-list{display:flex;flex-direction:column;gap:8px;}
+  .check-item{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px;cursor:pointer;transition:all .2s;user-select:none;}
+  .check-item:hover{border-color:#333;}
+  .check-item.done{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.25);}
+  .check-box{width:20px;height:20px;border:2px solid #444;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:12px;color:transparent;}
+  .check-item.done .check-box{background:var(--check);border-color:var(--check);color:white;}
+  .check-text{font-size:14px;flex:1;}
+  .check-item.done .check-text{color:var(--muted);text-decoration:line-through;}
+  .check-tag{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:2px;letter-spacing:1px;white-space:nowrap;}
+  .tag-treino{background:rgba(232,255,74,.1);color:var(--phase1);}
+  .tag-cardio{background:rgba(255,107,53,.1);color:var(--phase2);}
+  .tag-nutri{background:rgba(185,124,255,.1);color:var(--nutri);}
+  .tag-habito{background:rgba(74,240,255,.1);color:var(--phase3);}
+
+  .streak-bar{display:flex;gap:6px;margin-bottom:32px;flex-wrap:wrap;}
+  .streak-day{width:40px;height:40px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;cursor:default;transition:transform .1s;}
+  .streak-day:hover{transform:scale(1.1);}
+  .streak-day.past-done{background:rgba(34,197,94,.2);color:var(--check);border:1px solid rgba(34,197,94,.3);}
+  .streak-day.past-miss{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border);}
+  .streak-day.today{border:2px solid var(--accent);color:var(--accent);background:rgba(232,255,74,.08);}
+
+  footer{padding:40px;border-top:1px solid var(--border);text-align:center;}
+  .footer-text{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:2px;}
+
+  @media(max-width:600px){
+    header,.content{padding:24px 20px;}
+    .phases-nav{padding:0 20px;}
+    footer{padding:24px 20px;}
+    h1{font-size:48px;}
+    .current-date{font-size:20px;min-width:160px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Personal Coaching Plan · 12 Semanas</div>
+  <h1>TREINO <span>+</span><br>NUTRIÇÃO</h1>
+  <div class="header-meta">
+    <div class="meta-item"><span class="meta-label">Perfil</span><span class="meta-value">Masculino · 86kg · 1,78m</span></div>
+    <div class="meta-item"><span class="meta-label">Nível</span><span class="meta-value">Iniciante / Retorno</span></div>
+    <div class="meta-item"><span class="meta-label">Objetivo</span><span class="meta-value">Perda de gordura + Condicionamento</span></div>
+    <div class="meta-item"><span class="meta-label">Estrutura</span><span class="meta-value">5× musculação · cardio diário · 3 refeições</span></div>
+  </div>
+</header>
+
+<nav class="phases-nav">
+  <button class="phase-tab active" data-phase="checkin" onclick="showPhase('checkin')">✓ CHECK DIÁRIO</button>
+  <button class="phase-tab" data-phase="nutri" onclick="showPhase('nutri')">NUTRIÇÃO</button>
+  <button class="phase-tab" data-phase="1" onclick="showPhase('1')">FASE 1 · Sem 1–4</button>
+  <button class="phase-tab" data-phase="2" onclick="showPhase('2')">FASE 2 · Sem 5–8</button>
+  <button class="phase-tab" data-phase="3" onclick="showPhase('3')">FASE 3 · Sem 9–12</button>
+  <button class="phase-tab" data-phase="cardio" onclick="showPhase('cardio')">CARDIO</button>
+</nav>
+
+<div class="content">
+
+<!-- CHECK DIÁRIO -->
+<div class="phase-panel active" id="panel-checkin">
+  <div class="phase-header">
+    <div><div class="phase-title" style="color:var(--check)">CHECK DIÁRIO</div><div class="phase-subtitle">Marque cada tarefa concluída · Dados salvos automaticamente no navegador</div></div>
+    <div class="phase-badge badge-check">CONSISTÊNCIA</div>
+  </div>
+
+  <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+    <span style="color:var(--muted)">STATUS</span>
+    <span id="syncStatus" style="color:var(--muted)">⏳ Inicializando...</span>
+  </div>
+
+  <div class="checkin-top">
+    <div class="date-nav">
+      <button class="date-btn" onclick="changeDay(-1)">← Ant</button>
+      <div class="current-date" id="currentDateLabel"></div>
+      <button class="date-btn" onclick="changeDay(1)">Próx →</button>
+    </div>
+    <button class="reset-btn" onclick="resetDay()">LIMPAR DIA</button>
+  </div>
+
+  <div class="section-title" style="margin-top:0">Últimos 7 Dias</div>
+  <div class="streak-bar" id="streakBar"></div>
+
+  <div class="progress-summary">
+    <div class="prog-pill"><div class="prog-pill-num" id="sumTotal">0</div><div class="prog-pill-label">FEITOS HOJE</div></div>
+    <div class="prog-pill"><div class="prog-pill-num" id="sumTreino" style="color:var(--phase1)">0</div><div class="prog-pill-label">TREINO</div></div>
+    <div class="prog-pill"><div class="prog-pill-num" id="sumNutri" style="color:var(--nutri)">0</div><div class="prog-pill-label">NUTRIÇÃO</div></div>
+    <div class="prog-pill"><div class="prog-pill-num" id="sumHabito" style="color:var(--phase3)">0</div><div class="prog-pill-label">HÁBITOS</div></div>
+    <div class="prog-pill"><div class="prog-pill-num" id="sumStreak">0</div><div class="prog-pill-label">DIAS SEGUIDOS</div></div>
+  </div>
+
+  <div class="check-section">
+    <div class="check-section-title">🏋️ Treino</div>
+    <div class="check-list">
+      <div class="check-item" data-id="t1" data-cat="treino" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Completei o treino de musculação do dia</span><span class="check-tag tag-treino">TREINO</span></div>
+      <div class="check-item" data-id="t2" data-cat="treino" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Fiz o aquecimento (5–10 min)</span><span class="check-tag tag-treino">TREINO</span></div>
+      <div class="check-item" data-id="t3" data-cat="treino" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Registrei as cargas usadas hoje</span><span class="check-tag tag-treino">TREINO</span></div>
+    </div>
+  </div>
+
+  <div class="check-section">
+    <div class="check-section-title">🚴 Cardio</div>
+    <div class="check-list">
+      <div class="check-item" data-id="c1" data-cat="cardio" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Completei o cardio do dia (conforme fase atual)</span><span class="check-tag tag-cardio">CARDIO</span></div>
+      <div class="check-item" data-id="c2" data-cat="cardio" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Cardio foi feito DEPOIS da musculação</span><span class="check-tag tag-cardio">CARDIO</span></div>
+    </div>
+  </div>
+
+  <div class="check-section">
+    <div class="check-section-title">🥩 Nutrição</div>
+    <div class="check-list">
+      <div class="check-item" data-id="n1" data-cat="nutri" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Refeição 1 completa — café da manhã com proteína</span><span class="check-tag tag-nutri">NUTRI</span></div>
+      <div class="check-item" data-id="n2" data-cat="nutri" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Refeição 2 completa — almoço com proteína + salada</span><span class="check-tag tag-nutri">NUTRI</span></div>
+      <div class="check-item" data-id="n3" data-cat="nutri" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Refeição 3 completa — jantar com proteína + legumes</span><span class="check-tag tag-nutri">NUTRI</span></div>
+      <div class="check-item" data-id="n4" data-cat="nutri" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Atingi ~170g de proteína no dia</span><span class="check-tag tag-nutri">NUTRI</span></div>
+      <div class="check-item" data-id="n5" data-cat="nutri" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Registrei o que comi (MyFitnessPal ou foto)</span><span class="check-tag tag-nutri">NUTRI</span></div>
+      <div class="check-item" data-id="n6" data-cat="nutri" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Fiquei dentro de ~2.200 kcal</span><span class="check-tag tag-nutri">NUTRI</span></div>
+    </div>
+  </div>
+
+  <div class="check-section">
+    <div class="check-section-title">🌙 Hábitos & Recuperação</div>
+    <div class="check-list">
+      <div class="check-item" data-id="h1" data-cat="habito" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Dormi 7–9 horas esta noite</span><span class="check-tag tag-habito">HÁBITO</span></div>
+      <div class="check-item" data-id="h2" data-cat="habito" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Tomei pelo menos 3,0L de água (dias de treino) · 2,5L (descanso)</span><span class="check-tag tag-habito">HÁBITO</span></div>
+      <div class="check-item" data-id="h3" data-cat="habito" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Evitei alimentos ultraprocessados</span><span class="check-tag tag-habito">HÁBITO</span></div>
+      <div class="check-item" data-id="h4" data-cat="habito" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Pesou em jejum (dias: seg, qua, sex)</span><span class="check-tag tag-habito">HÁBITO</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- NUTRIÇÃO -->
+<div class="phase-panel" id="panel-nutri">
+  <div class="phase-header">
+    <div><div class="phase-title" style="color:var(--nutri)">NUTRIÇÃO</div><div class="phase-subtitle">Déficit moderado · Foco em proteína · Sem restrições extremas</div></div>
+    <div class="phase-badge badge-nutri">2.200 KCAL</div>
+  </div>
+
+  <div class="macro-bar">
+    <div class="macro-pill"><div class="macro-num kcal-color">2200</div><div class="macro-unit">KCAL / DIA</div><div class="macro-name">Meta calórica</div></div>
+    <div class="macro-pill"><div class="macro-num prot-color">170g</div><div class="macro-unit">PROTEÍNA</div><div class="macro-name">Prioridade #1</div></div>
+    <div class="macro-pill"><div class="macro-num carb-color">220g</div><div class="macro-unit">CARBOIDRATO</div><div class="macro-name">Energia p/ treino</div></div>
+    <div class="macro-pill"><div class="macro-num fat-color">60g</div><div class="macro-unit">GORDURA</div><div class="macro-name">Hormônios & saciedade</div></div>
+  </div>
+
+  <div class="section-title">Cardápio Base</div>
+  <div class="meal-grid">
+    <div class="meal-card">
+      <div class="meal-header"><span class="meal-name">Refeição 1 · Café da manhã</span><span class="meal-kcal">~450 kcal</span></div>
+      <div class="meal-body">
+        <div class="meal-item"><span class="meal-item-name">4 ovos mexidos</span><span class="meal-item-macro">28g prot</span></div>
+        <div class="meal-item"><span class="meal-item-name">2 fatias pão integral</span><span class="meal-item-macro">6g prot</span></div>
+        <div class="meal-item"><span class="meal-item-name">1 fruta (banana / maçã)</span><span class="meal-item-macro">~25g carb</span></div>
+        <div class="meal-item"><span class="meal-item-name">Café sem açúcar</span><span class="meal-item-macro">—</span></div>
+        <div class="meal-prot">↑ ~34g proteína</div>
+        <div class="meal-alt">Alternativa: iogurte grego 200g + granola 30g + banana → ~20g prot</div>
+      </div>
+    </div>
+    <div class="meal-card">
+      <div class="meal-header"><span class="meal-name">Refeição 2 · Almoço</span><span class="meal-kcal">~650 kcal</span></div>
+      <div class="meal-body">
+        <div class="meal-item"><span class="meal-item-name">150g frango grelhado ou carne magra</span><span class="meal-item-macro">38g prot</span></div>
+        <div class="meal-item"><span class="meal-item-name">Arroz (4 col. de sopa)</span><span class="meal-item-macro">45g carb</span></div>
+        <div class="meal-item"><span class="meal-item-name">Feijão (2 conchas)</span><span class="meal-item-macro">10g prot</span></div>
+        <div class="meal-item"><span class="meal-item-name">Salada à vontade (ver rodízio)</span><span class="meal-item-macro">—</span></div>
+        <div class="meal-item"><span class="meal-item-name">Azeite (1 col. de sopa)</span><span class="meal-item-macro">14g gorд</span></div>
+        <div class="meal-prot">↑ ~48g proteína</div>
+      </div>
+    </div>
+    <div class="meal-card">
+      <div class="meal-header"><span class="meal-name">Refeição 3 · Jantar</span><span class="meal-kcal">~550 kcal</span></div>
+      <div class="meal-body">
+        <div class="meal-item"><span class="meal-item-name">150g proteína (frango/peixe/atum/carne)</span><span class="meal-item-macro">38g prot</span></div>
+        <div class="meal-item"><span class="meal-item-name">Batata-doce ou arroz (3 col.)</span><span class="meal-item-macro">35g carb</span></div>
+        <div class="meal-item"><span class="meal-item-name">Legumes refogados ou salada</span><span class="meal-item-macro">—</span></div>
+        <div class="meal-item"><span class="meal-item-name">Azeite (1 col. de sopa)</span><span class="meal-item-macro">14g gord</span></div>
+        <div class="meal-prot">↑ ~40g proteína</div>
+      </div>
+    </div>
+    <div class="meal-card">
+      <div class="meal-header"><span class="meal-name">Snack · Pré/Pós-treino</span><span class="meal-kcal">~220 kcal</span></div>
+      <div class="meal-body">
+        <div class="meal-item"><span class="meal-item-name">Opção A: Whey (1 scoop) + banana</span><span class="meal-item-macro">25g prot</span></div>
+        <div class="meal-item"><span class="meal-item-name">Opção B: Atum em lata + torrada integral</span><span class="meal-item-macro">22g prot</span></div>
+        <div class="meal-item"><span class="meal-item-name">Opção C: Iogurte grego + mel</span><span class="meal-item-macro">18g prot</span></div>
+        <div class="meal-prot">↑ ~22–25g proteína</div>
+        <div class="meal-alt">Use quando o treino estiver distante do almoço/jantar</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Rodízio de Saladas — 10 Opções</div>
+  <div class="salad-grid">
+    <div class="salad-card"><div class="salad-num">01</div><div class="salad-name">Tomate + Pepino + Cebola roxa</div><div class="salad-desc">Azeite + orégano + sal. Clássica, refrescante, zero esforço.</div></div>
+    <div class="salad-card"><div class="salad-num">02</div><div class="salad-name">Brócolis no vapor + Alho</div><div class="salad-desc">Azeite + limão. Pode ser quente. Denso e saciante.</div></div>
+    <div class="salad-card"><div class="salad-num">03</div><div class="salad-name">Cenoura + Beterraba raladas</div><div class="salad-desc">Limão + azeite. Doce natural, rico em fibras e antioxidantes.</div></div>
+    <div class="salad-card"><div class="salad-num">04</div><div class="salad-name">Abobrinha + Pimentão grelhados</div><div class="salad-desc">Cebola roxa. Grelha junto com a proteína do jantar.</div></div>
+    <div class="salad-card"><div class="salad-num">05</div><div class="salad-name">Palmito + Tomate-cereja + Rúcula</div><div class="salad-desc">Balsâmico + azeite. Leve mas com personalidade.</div></div>
+    <div class="salad-card"><div class="salad-num">06</div><div class="salad-name">Mix legumes assados</div><div class="salad-desc">Abobrinha, cebola, pimentão, berinjela. Faz em lote — 3 refeições.</div></div>
+    <div class="salad-card"><div class="salad-num">07</div><div class="salad-name">Grão-de-bico temperado</div><div class="salad-desc">Tomate + cebola + salsinha + azeite. Conta ~150 kcal por porção.</div></div>
+    <div class="salad-card"><div class="salad-num">08</div><div class="salad-name">Couve-flor + Cenoura + Ervilha</div><div class="salad-desc">Azeite + sal. Fácil, barato, versátil.</div></div>
+    <div class="salad-card"><div class="salad-num">09</div><div class="salad-name">Pepino + Iogurte + Hortelã</div><div class="salad-desc">Estilo tzatziki. Ótimo com frango.</div></div>
+    <div class="salad-card"><div class="salad-num">10</div><div class="salad-name">Berinjela assada + Tomate + Alho</div><div class="salad-desc">Azeite. Prepara em lote — dura 3 dias na geladeira.</div></div>
+  </div>
+
+  <div class="section-title">Rodízio Semanal</div>
+  <table class="prog-table" style="margin-bottom:32px">
+    <thead><tr><th>Dia</th><th>Salada</th><th>Dica de Prep</th></tr></thead>
+    <tbody>
+      <tr><td style="color:var(--phase1);font-family:'DM Mono',monospace">Segunda</td><td>Tomate + Pepino + Cebola roxa</td><td>Corta na hora, 5 min</td></tr>
+      <tr><td style="color:var(--phase1);font-family:'DM Mono',monospace">Terça</td><td>Brócolis no vapor + Alho</td><td>Cozinha no domingo</td></tr>
+      <tr><td style="color:var(--phase1);font-family:'DM Mono',monospace">Quarta</td><td>Cenoura + Beterraba raladas</td><td>Rala no domingo, guarda em pote</td></tr>
+      <tr><td style="color:var(--phase2);font-family:'DM Mono',monospace">Quinta</td><td>Abobrinha + Pimentão grelhados</td><td>Grelha junto com a proteína</td></tr>
+      <tr><td style="color:var(--phase2);font-family:'DM Mono',monospace">Sexta</td><td>Palmito + Tomate-cereja + Rúcula</td><td>Só mistura, 3 min</td></tr>
+      <tr><td style="color:var(--phase3);font-family:'DM Mono',monospace">Sábado</td><td>Mix legumes assados</td><td>Assa no domingo — usa sáb e dom</td></tr>
+      <tr><td style="color:var(--phase3);font-family:'DM Mono',monospace">Domingo</td><td>Grão-de-bico temperado</td><td>Cozinha em lote na semana</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Regras da Nutrição</div>
+  <div class="notes-grid">
+    <div class="note-card purple"><div class="note-title">Regra #1</div><div class="note-text">Proteína em toda refeição. Todo prato tem uma fonte proteica. Simples assim.</div></div>
+    <div class="note-card"><div class="note-title">Regra #2</div><div class="note-text">3 refeições fixas por dia. Não importa o horário exato — define 3 momentos e mantém.</div></div>
+    <div class="note-card orange"><div class="note-title">Regra #3</div><div class="note-text">Registra tudo. MyFitnessPal ou foto. Não pra ser perfeito, mas pra ter consciência.</div></div>
+    <div class="note-card blue"><div class="note-title">70% já basta</div><div class="note-text">Consistência de 70–80% produz resultado real. Perfeição não é o objetivo — manutenção é.</div></div>
+    <div class="note-card purple"><div class="note-title">Azeite sempre</div><div class="note-text">Tempera com azeite, limão ou vinagre, ervas. Evita molhos prontos — açúcar escondido.</div></div>
+    <div class="note-card"><div class="note-title">Prep de domingo</div><div class="note-text">20 min no domingo resolvem metade da semana: brócolis, beterraba, legumes assados, grão-de-bico.</div></div>
+  </div>
+</div>
+
+<!-- FASE 1 -->
+<div class="phase-panel" id="panel-1">
+  <div class="phase-header">
+    <div><div class="phase-title" style="color:var(--phase1)">FASE 1</div><div class="phase-subtitle">Adaptação neuromuscular · Técnica · Base aeróbica · Semanas 1–4</div></div>
+    <div class="phase-badge badge-p1">FUNDAÇÃO</div>
+  </div>
+  <div class="week-grid">
+    <div class="day-card"><div class="day-header"><span class="day-name">Segunda</span><span class="day-type type-upper">Superiores A</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Supino com halteres</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Remada curvada com halteres</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Desenvolvimento com halteres</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Rosca direta com halteres</span><span class="exercise-sets">2 × 15</span></li><li class="exercise-item"><span class="exercise-name">Tríceps na polia / testa</span><span class="exercise-sets">2 × 15</span></li><li class="exercise-item"><span class="exercise-name">Prancha isométrica</span><span class="exercise-sets">3 × 30s</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Terça</span><span class="day-type type-lower">Inferiores A</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Agachamento livre / goblet</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Leg press 45°</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Cadeira extensora</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Mesa flexora</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Panturrilha em pé</span><span class="exercise-sets">3 × 20</span></li><li class="exercise-item"><span class="exercise-name">Abdominal crunch</span><span class="exercise-sets">3 × 20</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Quarta</span><span class="day-type type-full">Full Body</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Puxada frontal (máquina)</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Supino inclinado halteres</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Afundo com halteres</span><span class="exercise-sets">3 × 10/lado</span></li><li class="exercise-item"><span class="exercise-name">Elevação lateral</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Rosca martelo</span><span class="exercise-sets">2 × 12</span></li><li class="exercise-item"><span class="exercise-name">Prancha lateral</span><span class="exercise-sets">2 × 20s/lado</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Quinta</span><span class="day-type type-lower">Inferiores B</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Stiff com halteres</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Cadeira adutora</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Agachamento sumô</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Elevação de quadril (chão)</span><span class="exercise-sets">3 × 20</span></li><li class="exercise-item"><span class="exercise-name">Panturrilha sentado</span><span class="exercise-sets">3 × 20</span></li><li class="exercise-item"><span class="exercise-name">Abdominal bicicleta</span><span class="exercise-sets">3 × 20</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Sexta</span><span class="day-type type-upper">Superiores B</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Crucifixo com halteres</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Remada unilateral</span><span class="exercise-sets">3 × 12/lado</span></li><li class="exercise-item"><span class="exercise-name">Elevação frontal</span><span class="exercise-sets">2 × 15</span></li><li class="exercise-item"><span class="exercise-name">Tríceps francês</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Rosca concentrada</span><span class="exercise-sets">2 × 12/lado</span></li><li class="exercise-item"><span class="exercise-name">Abdominal infra</span><span class="exercise-sets">3 × 15</span></li></ul></div></div>
+    <div class="day-card rest"><div class="day-header"><span class="day-name">Sáb / Dom</span><span class="day-type type-rest">Descanso ativo</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Caminhada leve 20–30min</span><span class="exercise-sets">opcional</span></li><li class="exercise-item"><span class="exercise-name">Alongamento / mobilidade</span><span class="exercise-sets">15min</span></li></ul></div></div>
+  </div>
+  <div class="section-title">Parâmetros Fase 1</div>
+  <table class="prog-table"><thead><tr><th>Parâmetro</th><th>Valor</th><th>Observação</th></tr></thead><tbody>
+    <tr><td>Carga</td><td>60–65% do máximo</td><td>Técnica perfeita em todas as reps</td></tr>
+    <tr><td>Descanso</td><td>60–90 segundos</td><td>Reduz conforme adaptação</td></tr>
+    <tr><td>Execução</td><td>2s descida / 1s subida</td><td>Sem soltar o peso na excêntrica</td></tr>
+    <tr><td>RPE</td><td>6–7 / 10</td><td>Termina a série podendo fazer 2–3 reps a mais</td></tr>
+    <tr><td>Progressão</td><td>+2,5kg por vez</td><td>Só muda se completar todas as séries com boa técnica</td></tr>
+  </tbody></table>
+</div>
+
+<!-- FASE 2 -->
+<div class="phase-panel" id="panel-2">
+  <div class="phase-header">
+    <div><div class="phase-title" style="color:var(--phase2)">FASE 2</div><div class="phase-subtitle">Hipertrofia + queima calórica · Intensidade moderada-alta · Semanas 5–8</div></div>
+    <div class="phase-badge badge-p2">DESENVOLVIMENTO</div>
+  </div>
+  <div class="week-grid">
+    <div class="day-card"><div class="day-header"><span class="day-name">Segunda</span><span class="day-type type-upper">Peito + Tríceps</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Supino com halteres</span><span class="exercise-sets">4 × 10</span></li><li class="exercise-item"><span class="exercise-name">Supino inclinado</span><span class="exercise-sets">3 × 10</span></li><li class="exercise-item"><span class="exercise-name">Crucifixo inclinado</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Tríceps polia (corda)</span><span class="exercise-sets">4 × 12</span></li><li class="exercise-item"><span class="exercise-name">Tríceps francês haltere</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Prancha com alcance</span><span class="exercise-sets">3 × 10/lado</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Terça</span><span class="day-type type-lower">Quad + Glúteo</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Agachamento livre</span><span class="exercise-sets">4 × 10</span></li><li class="exercise-item"><span class="exercise-name">Leg press 45°</span><span class="exercise-sets">4 × 12</span></li><li class="exercise-item"><span class="exercise-name">Afundo alternado</span><span class="exercise-sets">3 × 12/lado</span></li><li class="exercise-item"><span class="exercise-name">Cadeira extensora</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Elevação pélvica barra</span><span class="exercise-sets">4 × 12</span></li><li class="exercise-item"><span class="exercise-name">Panturrilha em pé</span><span class="exercise-sets">4 × 20</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Quarta</span><span class="day-type type-upper">Costas + Bíceps</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Puxada frontal</span><span class="exercise-sets">4 × 10</span></li><li class="exercise-item"><span class="exercise-name">Remada curvada barra</span><span class="exercise-sets">4 × 10</span></li><li class="exercise-item"><span class="exercise-name">Remada cavalinho</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Pullover haltere</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Rosca direta barra</span><span class="exercise-sets">4 × 12</span></li><li class="exercise-item"><span class="exercise-name">Rosca martelo</span><span class="exercise-sets">3 × 12</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Quinta</span><span class="day-type type-lower">Posterior + Core</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Levantamento terra romeno</span><span class="exercise-sets">4 × 10</span></li><li class="exercise-item"><span class="exercise-name">Mesa flexora</span><span class="exercise-sets">4 × 12</span></li><li class="exercise-item"><span class="exercise-name">Cadeira adutora</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Agachamento sumô</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Abdominal crunch c/ peso</span><span class="exercise-sets">4 × 15</span></li><li class="exercise-item"><span class="exercise-name">Russian twist</span><span class="exercise-sets">3 × 20</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Sexta</span><span class="day-type type-upper">Ombros + Full</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Desenvolvimento barra/halter</span><span class="exercise-sets">4 × 10</span></li><li class="exercise-item"><span class="exercise-name">Elevação lateral</span><span class="exercise-sets">4 × 15</span></li><li class="exercise-item"><span class="exercise-name">Elevação frontal alternada</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Face pull (polia)</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Supino declinado</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Prancha dinâmica</span><span class="exercise-sets">3 × 30s</span></li></ul></div></div>
+    <div class="day-card rest"><div class="day-header"><span class="day-name">Sáb / Dom</span><span class="day-type type-rest">Descanso ativo</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Caminhada leve 30min</span><span class="exercise-sets">recomendado</span></li><li class="exercise-item"><span class="exercise-name">Mobilidade / foam roller</span><span class="exercise-sets">15–20min</span></li></ul></div></div>
+  </div>
+  <div class="section-title">Parâmetros Fase 2</div>
+  <table class="prog-table"><thead><tr><th>Parâmetro</th><th>Valor</th><th>Observação</th></tr></thead><tbody>
+    <tr><td>Carga</td><td>70–75% do máximo</td><td>Últimas 2 reps difíceis mas controláveis</td></tr>
+    <tr><td>Descanso</td><td>60–75 segundos</td><td>Reduzir gradualmente ao longo das semanas</td></tr>
+    <tr><td>Técnica</td><td>Amplitude completa</td><td>Sem compensações — reduz carga se necessário</td></tr>
+    <tr><td>RPE</td><td>7–8 / 10</td><td>Mais intenso que fase 1; sensação de esforço real</td></tr>
+    <tr><td>Progressão</td><td>+2,5kg a cada 1–2 semanas</td><td>Ou adicionar 1 série antes de aumentar carga</td></tr>
+  </tbody></table>
+</div>
+
+<!-- FASE 3 -->
+<div class="phase-panel" id="panel-3">
+  <div class="phase-header">
+    <div><div class="phase-title" style="color:var(--phase3)">FASE 3</div><div class="phase-subtitle">Intensidade máxima · Supersets · Consolidação · Semanas 9–12</div></div>
+    <div class="phase-badge badge-p3">INTENSIFICAÇÃO</div>
+  </div>
+  <div class="week-grid">
+    <div class="day-card"><div class="day-header"><span class="day-name">Segunda</span><span class="day-type type-upper">Peito + Costas (SS)</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">SS: Supino + Remada curvada</span><span class="exercise-sets">4 × 8–10</span></li><li class="exercise-item"><span class="exercise-name">SS: Supino inclinado + Puxada</span><span class="exercise-sets">4 × 10</span></li><li class="exercise-item"><span class="exercise-name">Crucifixo + Pullover</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Prancha c/ elevação de perna</span><span class="exercise-sets">3 × 10/lado</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Terça</span><span class="day-type type-lower">Inferiores (SS)</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">SS: Agachamento + Leg press</span><span class="exercise-sets">4 × 8–10</span></li><li class="exercise-item"><span class="exercise-name">SS: Afundo + Elevação pélvica</span><span class="exercise-sets">4 × 10/lado</span></li><li class="exercise-item"><span class="exercise-name">SS: Extensora + Flexora</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Panturrilha + Abdominal</span><span class="exercise-sets">3 × 20</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Quarta</span><span class="day-type type-upper">Ombros + Braços (SS)</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Desenvolvimento + Face pull</span><span class="exercise-sets">4 × 10</span></li><li class="exercise-item"><span class="exercise-name">Elevação lateral + Frontal</span><span class="exercise-sets">4 × 12</span></li><li class="exercise-item"><span class="exercise-name">SS: Rosca direta + Tríceps polia</span><span class="exercise-sets">4 × 12</span></li><li class="exercise-item"><span class="exercise-name">SS: Rosca martelo + Tríceps testa</span><span class="exercise-sets">3 × 12</span></li><li class="exercise-item"><span class="exercise-name">Core: Roda abdominal</span><span class="exercise-sets">3 × 10</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Quinta</span><span class="day-type type-lower">Posterior + Glúteo (SS)</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Terra romeno + Flexora</span><span class="exercise-sets">4 × 10</span></li><li class="exercise-item"><span class="exercise-name">Elevação pélvica c/ barra</span><span class="exercise-sets">4 × 12</span></li><li class="exercise-item"><span class="exercise-name">SS: Adutora + Abdutora</span><span class="exercise-sets">3 × 15</span></li><li class="exercise-item"><span class="exercise-name">Agachamento búlgaro</span><span class="exercise-sets">3 × 10/lado</span></li><li class="exercise-item"><span class="exercise-name">Panturrilha unilateral</span><span class="exercise-sets">3 × 15/lado</span></li></ul></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Sexta</span><span class="day-type type-full">Full Body Metabólico</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Agachamento + Press haltere</span><span class="exercise-sets">4 × 12</span></li><li class="exercise-item"><span class="exercise-name">Terra romeno + Remada</span><span class="exercise-sets">4 × 10</span></li><li class="exercise-item"><span class="exercise-name">Afundo + Desenvolvimento</span><span class="exercise-sets">3 × 10/lado</span></li><li class="exercise-item"><span class="exercise-name">Prancha + Remo haltere</span><span class="exercise-sets">3 × 8/lado</span></li><li class="exercise-item"><span class="exercise-name">Burpee modificado</span><span class="exercise-sets">3 × 10</span></li></ul></div></div>
+    <div class="day-card rest"><div class="day-header"><span class="day-name">Sáb / Dom</span><span class="day-type type-rest">Recuperação ativa</span></div><div class="day-body"><ul class="exercise-list"><li class="exercise-item"><span class="exercise-name">Caminhada 30–40min</span><span class="exercise-sets">recomendado</span></li><li class="exercise-item"><span class="exercise-name">Mobilidade / alongamento</span><span class="exercise-sets">20min</span></li></ul></div></div>
+  </div>
+  <div class="section-title">Parâmetros Fase 3</div>
+  <table class="prog-table"><thead><tr><th>Parâmetro</th><th>Valor</th><th>Observação</th></tr></thead><tbody>
+    <tr><td>Carga</td><td>75–80% do máximo</td><td>Alta intensidade — técnica não pode quebrar</td></tr>
+    <tr><td>Supersets (SS)</td><td>Sem descanso entre pares</td><td>60–90s de descanso após o par completo</td></tr>
+    <tr><td>Descanso</td><td>45–60 segundos</td><td>Densidade alta = mais calorias queimadas</td></tr>
+    <tr><td>RPE</td><td>8–9 / 10</td><td>Última série ao limite controlado</td></tr>
+    <tr><td>Progressão</td><td>Volume antes de carga</td><td>Adiciona 1 superset por semana antes de aumentar peso</td></tr>
+  </tbody></table>
+</div>
+
+<!-- CARDIO -->
+<div class="phase-panel" id="panel-cardio">
+  <div class="phase-header">
+    <div><div class="phase-title" style="color:var(--accent2)">CARDIO</div><div class="phase-subtitle">Progressão de 12 semanas · Todos os dias · Moderado a vigoroso</div></div>
+    <div class="phase-badge badge-p2">DIÁRIO</div>
+  </div>
+  <div class="section-title" style="margin-top:0">Protocolo por Fase</div>
+  <div class="cardio-grid">
+    <div class="cardio-card"><div class="cardio-week p1-color">SEMANAS 1–2</div><div class="cardio-name">Caminhada<br>Moderada</div><div class="cardio-detail"><div class="cardio-row"><span class="cardio-label">Duração</span><span class="cardio-val">20–25 min</span></div><div class="cardio-row"><span class="cardio-label">Intensidade</span><span class="cardio-val">Zona 2 · FC 60–65%</span></div><div class="cardio-row"><span class="cardio-label">Tipo</span><span class="cardio-val">Esteira ou ar livre</span></div><div class="cardio-row"><span class="cardio-label">Quando</span><span class="cardio-val">Pós-musculação</span></div></div></div>
+    <div class="cardio-card"><div class="cardio-week p1-color">SEMANAS 3–4</div><div class="cardio-name">Bicicleta<br>Constante</div><div class="cardio-detail"><div class="cardio-row"><span class="cardio-label">Duração</span><span class="cardio-val">25–30 min</span></div><div class="cardio-row"><span class="cardio-label">Intensidade</span><span class="cardio-val">Zona 2–3 · FC 65–70%</span></div><div class="cardio-row"><span class="cardio-label">Tipo</span><span class="cardio-val">Bicicleta ergométrica</span></div><div class="cardio-row"><span class="cardio-label">Quando</span><span class="cardio-val">Pós-musculação</span></div></div></div>
+    <div class="cardio-card"><div class="cardio-week p2-color">SEMANAS 5–6</div><div class="cardio-name">Intervalado<br>Leve (LISS+)</div><div class="cardio-detail"><div class="cardio-row"><span class="cardio-label">Duração</span><span class="cardio-val">30 min</span></div><div class="cardio-row"><span class="cardio-label">Protocolo</span><span class="cardio-val">3min mod / 1min leve</span></div><div class="cardio-row"><span class="cardio-label">Tipo</span><span class="cardio-val">Esteira inclinação 2–4%</span></div><div class="cardio-row"><span class="cardio-label">FC alvo</span><span class="cardio-val">65–72%</span></div></div></div>
+    <div class="cardio-card"><div class="cardio-week p2-color">SEMANAS 7–8</div><div class="cardio-name">Cardio Misto<br>+ Corda</div><div class="cardio-detail"><div class="cardio-row"><span class="cardio-label">Duração</span><span class="cardio-val">30–35 min</span></div><div class="cardio-row"><span class="cardio-label">Protocolo</span><span class="cardio-val">15min bike + 3×2min corda</span></div><div class="cardio-row"><span class="cardio-label">Descanso corda</span><span class="cardio-val">1 min entre rounds</span></div><div class="cardio-row"><span class="cardio-label">FC alvo</span><span class="cardio-val">70–75%</span></div></div></div>
+    <div class="cardio-card"><div class="cardio-week p3-color">SEMANAS 9–10</div><div class="cardio-name">HIIT<br>Moderado</div><div class="cardio-detail"><div class="cardio-row"><span class="cardio-label">Duração</span><span class="cardio-val">25–30 min total</span></div><div class="cardio-row"><span class="cardio-label">Protocolo</span><span class="cardio-val">30s forte / 90s leve × 8–10</span></div><div class="cardio-row"><span class="cardio-label">Tipo</span><span class="cardio-val">Esteira · bike · corda</span></div><div class="cardio-row"><span class="cardio-label">FC pico</span><span class="cardio-val">80–85%</span></div></div></div>
+    <div class="cardio-card"><div class="cardio-week p3-color">SEMANAS 11–12</div><div class="cardio-name">HIIT<br>Avançado</div><div class="cardio-detail"><div class="cardio-row"><span class="cardio-label">Duração</span><span class="cardio-val">30 min total</span></div><div class="cardio-row"><span class="cardio-label">Protocolo</span><span class="cardio-val">40s forte / 80s leve × 10–12</span></div><div class="cardio-row"><span class="cardio-label">Tipo</span><span class="cardio-val">Rotaciona os 3 equipamentos</span></div><div class="cardio-row"><span class="cardio-label">FC pico</span><span class="cardio-val">85–90%</span></div></div></div>
+  </div>
+  <div class="section-title">Regras do Cardio</div>
+  <div class="notes-grid">
+    <div class="note-card"><div class="note-title">Dias de musculação</div><div class="note-text">Cardio DEPOIS da musculação. Nunca antes — compromete força e qualidade do treino.</div></div>
+    <div class="note-card orange"><div class="note-title">Sábado e domingo</div><div class="note-text">Caminhada 20–30min em ritmo de conversa. Cardio de recuperação, não de performance. Obrigatório.</div></div>
+    <div class="note-card blue"><div class="note-title">Zona 2 é subestimada</div><div class="note-text">Cardio leve a moderado é o mais eficiente para queima de gordura sustentada a longo prazo.</div></div>
+    <div class="note-card"><div class="note-title">FC máxima estimada</div><div class="note-text">220 – 35 = ~185 bpm. Zona 2 = 111–120 bpm. Zona 3 = 120–130 bpm. Use como referência.</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+<div class="section-title">Regras Gerais</div>
+<div class="notes-grid">
+  <div class="note-card"><div class="note-title">Aquecimento</div><div class="note-text">5–10 min antes de cada treino. Bike leve, mobilidade articular ou 1 série com 50% da carga.</div></div>
+  <div class="note-card orange"><div class="note-title">Semana de deload</div><div class="note-text">Semana 4 e 8: volume –40%, carga –20%. Parte do plano. Previne lesão e melhora recuperação.</div></div>
+  <div class="note-card blue"><div class="note-title">Sono obrigatório</div><div class="note-text">7–9h de sono é parte do protocolo. Sem sono, o resultado é comprometido independente do resto.</div></div>
+  <div class="note-card"><div class="note-title">Dor muscular</div><div class="note-text">DOMS 24–48h depois = normal. Dor articular durante o movimento = para e corrige a técnica.</div></div>
+  <div class="note-card orange"><div class="note-title">Check-in semanal</div><div class="note-text">Peso, energia, qualidade do treino e consistência. Esses 4 dados direcionam os ajustes.</div></div>
+  <div class="note-card blue"><div class="note-title">Progressão de carga</div><div class="note-text">Só aumenta carga quando completar TODAS as séries com boa técnica. Forma nunca cede ao número.</div></div>
+</div>
+
+</div><!-- /content -->
+
+<footer>
+  <div class="footer-text">PLANO 12 SEMANAS · TREINO + NUTRIÇÃO + CHECK DIÁRIO · COACHING CONTÍNUO</div>
+</footer>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  // ── CONFIG ────────────────────────────────────────────────────────────────
+  const firebaseConfig = {
+    apiKey: "AIzaSyARQyevLpyeQdOvF7R7nbfTCzDCb8sypRg",
+    authDomain: "plano-12-semanas.firebaseapp.com",
+    projectId: "plano-12-semanas",
+    storageBucket: "plano-12-semanas.firebasestorage.app",
+    messagingSenderId: "549932803131",
+    appId: "1:549932803131:web:088071afa50c34954f281e",
+    measurementId: "G-K2K6YC0KG6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ── LOCAL CACHE (offline fallback) ────────────────────────────────────────
+  const CACHE_KEY = 'plano12sem_cache';
+  function cacheLoad() { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch { return {}; } }
+  function cacheSave(d) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(d)); } catch {} }
+  function cacheSetDay(ds, dayObj) { const c = cacheLoad(); c[ds] = dayObj; cacheSave(c); }
+  function cacheGetDay(ds) { return cacheLoad()[ds] || {}; }
+  function cacheDeleteDay(ds) { const c = cacheLoad(); delete c[ds]; cacheSave(c); }
+
+  // ── STATE ─────────────────────────────────────────────────────────────────
+  let currentDate = todayStr();
+  let localDayData = {};   // dados do dia atual em memória
+  let syncing = false;
+
+  function todayStr() { return new Date().toISOString().slice(0, 10); }
+
+  function setStatus(msg, color) {
+    const el = document.getElementById('syncStatus');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = color || 'var(--muted)';
+  }
+
+  // ── FIRESTORE HELPERS ─────────────────────────────────────────────────────
+  async function fsLoadDay(ds) {
+    try {
+      const ref = doc(db, 'checkins', ds);
+      const snap = await getDoc(ref);
+      const data = snap.exists() ? snap.data() : {};
+      cacheSetDay(ds, data);
+      return data;
+    } catch {
+      // offline — usa cache
+      return cacheGetDay(ds);
+    }
+  }
+
+  async function fsSaveDay(ds, dayObj) {
+    cacheSetDay(ds, dayObj);   // salva cache imediatamente
+    try {
+      await setDoc(doc(db, 'checkins', ds), dayObj);
+      setStatus('☁ Salvo na nuvem', 'var(--check)');
+    } catch {
+      setStatus('📵 Offline — salvo localmente', 'var(--accent2)');
+    }
+  }
+
+  async function fsDeleteDay(ds) {
+    cacheDeleteDay(ds);
+    try { await deleteDoc(doc(db, 'checkins', ds)); } catch {}
+  }
+
+  async function fsLoadAllDays() {
+    try {
+      const snap = await getDocs(collection(db, 'checkins'));
+      const result = {};
+      snap.forEach(d => { result[d.id] = d.data(); });
+      // merge com cache local
+      const cache = cacheLoad();
+      Object.assign(cache, result);
+      cacheSave(cache);
+      return cache;
+    } catch {
+      return cacheLoad();
+    }
+  }
+
+  // ── RENDER ────────────────────────────────────────────────────────────────
+  function formatDateLabel(str) {
+    const [y, m, day] = str.split('-').map(Number);
+    const date = new Date(y, m - 1, day);
+    const days   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return days[date.getDay()] + ', ' + day + ' ' + months[m-1] + ' ' + y;
+  }
+
+  function getAllIds() {
+    return [...document.querySelectorAll('.check-item[data-id]')].map(i => i.dataset.id);
+  }
+
+  function applyDayData() {
+    document.getElementById('currentDateLabel').textContent = formatDateLabel(currentDate);
+    document.querySelectorAll('.check-item[data-id]').forEach(item => {
+      item.classList.toggle('done', !!localDayData[item.dataset.id]);
+    });
+    updateSummary();
+    renderStreak();
+  }
+
+  async function renderChecklist() {
+    setStatus('⏳ Carregando...', 'var(--muted)');
+    localDayData = await fsLoadDay(currentDate);
+    applyDayData();
+    setStatus('☁ Sincronizado', 'var(--check)');
+  }
+
+  // ── ACTIONS ───────────────────────────────────────────────────────────────
+  window.changeDay = async function(delta) {
+    const d = new Date(currentDate + 'T12:00:00');
+    d.setDate(d.getDate() + delta);
+    currentDate = d.toISOString().slice(0, 10);
+    await renderChecklist();
+  };
+
+  window.toggleCheck = async function(el) {
+    const id = el.dataset.id;
+    const newVal = !localDayData[id];
+    localDayData[id] = newVal;
+    el.classList.toggle('done', newVal);
+    updateSummary();
+    setStatus('💾 Salvando...', 'var(--muted)');
+    await fsSaveDay(currentDate, localDayData);
+    renderStreak();
+  };
+
+  window.resetDay = async function() {
+    if (!confirm('Limpar todos os checks de ' + formatDateLabel(currentDate) + '?')) return;
+    localDayData = {};
+    applyDayData();
+    await fsDeleteDay(currentDate);
+    setStatus('🗑 Dia limpo', 'var(--accent2)');
+    renderStreak();
+  };
+
+  window.showPhase = function(phase) {
+    document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + phase).classList.add('active');
+    document.querySelector('[data-phase="' + phase + '"]').classList.add('active');
+  };
+
+  // ── SUMMARY & STREAK ─────────────────────────────────────────────────────
+  function updateSummary() {
+    let total = 0, treino = 0, nutri = 0, habito = 0;
+    document.querySelectorAll('.check-item[data-id]').forEach(item => {
+      if (localDayData[item.dataset.id]) {
+        total++;
+        const cat = item.dataset.cat;
+        if (cat === 'treino' || cat === 'cardio') treino++;
+        if (cat === 'nutri') nutri++;
+        if (cat === 'habito') habito++;
+      }
+    });
+    document.getElementById('sumTotal').textContent = total;
+    document.getElementById('sumTreino').textContent = treino;
+    document.getElementById('sumNutri').textContent = nutri;
+    document.getElementById('sumHabito').textContent = habito;
+  }
+
+  async function renderStreak() {
+    const bar = document.getElementById('streakBar');
+    bar.innerHTML = '';
+    const allData = await fsLoadAllDays();
+    const allIds  = getAllIds();
+    const threshold = Math.ceil(allIds.length * 0.5);
+    const today = todayStr();
+
+    // streak counter
+    let streak = 0;
+    let d2 = new Date(today + 'T12:00:00');
+    for (let i = 0; i < 90; i++) {
+      const ds = d2.toISOString().slice(0, 10);
+      const dd = allData[ds] || {};
+      const done = allIds.filter(id => dd[id]).length;
+      if (done >= threshold) { streak++; } else if (i > 0) { break; }
+      d2.setDate(d2.getDate() - 1);
+    }
+    document.getElementById('sumStreak').textContent = streak;
+
+    // 7-day bar
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today + 'T12:00:00');
+      d.setDate(d.getDate() - i);
+      const ds = d.toISOString().slice(0, 10);
+      const dd = allData[ds] || {};
+      const done = allIds.filter(id => dd[id]).length;
+      const isToday = ds === today;
+      const el = document.createElement('div');
+      el.className = 'streak-day ' + (isToday ? 'today' : (done >= threshold ? 'past-done' : 'past-miss'));
+      el.title = formatDateLabel(ds) + ' · ' + done + '/' + allIds.length + ' feitos';
+      el.textContent = d.getDate();
+      bar.appendChild(el);
+    }
+  }
+
+  // ── INIT ──────────────────────────────────────────────────────────────────
+  renderChecklist();
+</script>
+</body>
+</html>
